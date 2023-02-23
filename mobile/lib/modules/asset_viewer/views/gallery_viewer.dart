@@ -137,7 +137,7 @@ class GalleryViewerPage extends HookConsumerWidget {
           // Preload the local asset
           precacheImage(localImageProvider(asset), context);
         } else {
-          // Probably load WEBP either way
+          // Cache the thumbnail WEBP either way
           precacheImage(
             remoteThumbnailImageProvider(
               asset,
@@ -145,16 +145,16 @@ class GalleryViewerPage extends HookConsumerWidget {
             ),
             context,
           );
-          if (isLoadPreview.value) {
-            // Precache the JPEG thumbnail
-            precacheImage(
-              remoteThumbnailImageProvider(
-                asset,
-                api.ThumbnailFormat.JPEG,
-              ),
-              context,
-            );
-          }
+
+          // Precache the JPEG thumbnail
+          precacheImage(
+            remoteThumbnailImageProvider(
+              asset,
+              api.ThumbnailFormat.JPEG,
+            ),
+            context,
+          );
+
           if (isLoadOriginal.value) {
             // Preload the original asset
             precacheImage(
