@@ -174,6 +174,21 @@ extension AssetPathEntityHelper on AssetPathEntity {
     }
     return assetEntities.map(Asset.local).toList();
   }
+
+  Future<List<Asset>> getAssetsPage({
+    required int page,
+    required int size,
+    Set<String>? excludedAssets,
+  }) async {
+    final assetEntities = await getAssetListPaged(page: page, size: size);
+    if (excludedAssets != null) {
+      return assetEntities
+          .where((e) => !excludedAssets.contains(e.id))
+          .map(Asset.local)
+          .toList();
+    }
+    return assetEntities.map(Asset.local).toList();
+  }
 }
 
 extension AlbumResponseDtoHelper on AlbumResponseDto {

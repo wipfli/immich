@@ -126,9 +126,13 @@ class AlbumService {
     final Set<String> result = HashSet<String>();
     for (AssetPathEntity a in albums) {
       if (excludedAlbumIds.contains(a.id)) {
-        final List<AssetEntity> assets =
-            await a.getAssetListRange(start: 0, end: 0x7fffffffffffffff);
-        result.addAll(assets.map((e) => e.id));
+        const int batchSize = 1000;
+        for (int i = 0, stop = 0; stop == 0; i++) {
+          final List<AssetEntity> assets =
+              await a.getAssetListPaged(page: i, size: batchSize);
+          result.addAll(assets.map((e) => e.id));
+          stop = batchSize - assets.length;
+        }
       }
     }
     return result;

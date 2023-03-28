@@ -117,7 +117,11 @@ class ImmichLogger {
   void flush() {
     if (_timer != null) {
       _timer!.cancel();
-      _db.writeTxnSync(() => _db.loggerMessages.putAllSync(_msgBuffer));
+      try {
+        _db.writeTxnSync(() => _db.loggerMessages.putAllSync(_msgBuffer));
+      } on IsarError {
+        debugPrint("Failed to flush log messages to persistent storage!");
+      }
     }
   }
 }
