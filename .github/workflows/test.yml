@@ -135,6 +135,7 @@ jobs:
           files: |
             mobile/openapi
             web/src/api/open-api
+            sdk/typescript
       - name: Verify files have not changed
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |

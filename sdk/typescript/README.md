@@ -1,0 +1,1 @@
+## Immich TypsScript SDK for Immich Server

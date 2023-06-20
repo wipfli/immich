@@ -14,20 +14,24 @@ function mobile {
   sed -i 's/0.17.0/0.18.0/g' ../mobile/openapi/pubspec.yaml
 }
 
-function web {
+function typescript {
   rm -rf ../web/src/api/open-api
-  cd ./openapi-generator/templates/web
+  rm -rf ../sdk/typescript/*.ts
+
+  cd ./openapi-generator/templates/typescript
   wget -O apiInner.mustache https://raw.githubusercontent.com/OpenAPITools/openapi-generator/v6.0.1/modules/openapi-generator/src/main/resources/typescript-axios/apiInner.mustache
   patch -u apiInner.mustache < apiInner.mustache.patch
   cd ../../..
-  npx --yes @openapitools/openapi-generator-cli generate -g typescript-axios -i ./immich-openapi-specs.json -o ../web/src/api/open-api -t ./openapi-generator/templates/web --additional-properties=useSingleRequestParameter=true
+  npx --yes @openapitools/openapi-generator-cli generate -g typescript-axios -i ./immich-openapi-specs.json -o ../web/src/api/open-api -t ./openapi-generator/templates/typescript --additional-properties=useSingleRequestParameter=true
+
+  npx --yes @openapitools/openapi-generator-cli generate -g typescript-axios -i ./immich-openapi-specs.json -o ../sdk/typescript -t ./openapi-generator/templates/typescript --additional-properties=useSingleRequestParameter=true
 }
 
 if [[ $1 == 'mobile' ]]; then
   mobile
-elif [[ $1 == 'web' ]]; then
-  web
+elif [[ $1 == 'typescript' ]]; then
+  typescript
 else
   mobile
-  web
+  typescript
 fi
