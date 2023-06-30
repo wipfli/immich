@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Param,
   ParseFilePipe,
+  ParseFilePipeBuilder,
   Post,
   Put,
   Query,
@@ -89,7 +90,13 @@ export class AssetController {
   })
   async uploadFile(
     @AuthUser() authUser: AuthUserDto,
-    @UploadedFiles(new ParseFilePipe({ validators: [new FileNotEmptyValidator(['assetData'])] })) files: UploadFiles,
+    @UploadedFiles(
+      new ParseFilePipeBuilder()
+        .addValidator(new FileExtensionValidator())
+        .addValidator(new FileNotEmptyValidator(['assetData']))
+        .build(),
+    )
+    files: UploadFiles,
     @Body(new ValidationPipe()) dto: CreateAssetDto,
     @Response({ passthrough: true }) res: Res,
   ): Promise<AssetFileUploadResponseDto> {
