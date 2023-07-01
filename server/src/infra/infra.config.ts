@@ -1,9 +1,9 @@
-import { QueueName } from '@app/domain';
+import { QueueName } from '@app/domain/index.js';
 import { RegisterQueueOptions } from '@nestjs/bullmq';
 import { QueueOptions } from 'bullmq';
 import { RedisOptions } from 'ioredis';
 import { InitOptions } from 'local-reverse-geocoder';
-import { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration';
+import { ConfigurationOptions } from 'typesense/lib/Typesense/Configuration.js';
 
 function parseRedisConfig(): RedisOptions {
   const redisUrl = process.env.REDIS_URL;

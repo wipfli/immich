@@ -4,7 +4,7 @@ import {
   IMMICH_API_KEY_HEADER,
   IMMICH_API_KEY_NAME,
   SERVER_VERSION,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import { INestApplication, StreamableFile } from '@nestjs/common';
 import {
   DocumentBuilder,
@@ -15,7 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { writeFileSync } from 'fs';
 import path from 'path';
-import { Metadata } from './decorators/authenticated.decorator';
+import { Metadata } from './decorators/authenticated.decorator.js';
 
 export const asStreamableFile = ({ stream, type, length }: ImmichReadStream) => {
   return new StreamableFile(stream, { type, length });

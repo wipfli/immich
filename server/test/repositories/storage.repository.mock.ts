@@ -1,4 +1,4 @@
-import { IStorageRepository } from '@app/domain';
+import { IStorageRepository } from '@app/domain/index.js';
 
 export const newStorageRepositoryMock = (): jest.Mocked<IStorageRepository> => {
   return {

@@ -1,4 +1,4 @@
-import { IAccessRepository } from '@app/domain';
+import { IAccessRepository } from '@app/domain/index.js';
 
 export type IAccessRepositoryMock = {
   asset: jest.Mocked<IAccessRepository['asset']>;

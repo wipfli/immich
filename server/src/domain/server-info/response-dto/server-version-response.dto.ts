@@ -1,4 +1,4 @@
-import { IServerVersion } from '@app/domain';
+import { IServerVersion } from '@app/domain/index.js';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ServerVersionReponseDto implements IServerVersion {

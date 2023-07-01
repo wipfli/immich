@@ -7,13 +7,13 @@ import {
   OAuthConfigResponseDto,
   OAuthService,
   UserResponseDto,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import { Body, Controller, Get, HttpStatus, Post, Redirect, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { AuthUser, GetLoginDetails } from '../decorators/auth-user.decorator';
-import { Authenticated, PublicRoute } from '../decorators/authenticated.decorator';
-import { UseValidation } from '../decorators/use-validation.decorator';
+import { AuthUser, GetLoginDetails } from '../decorators/auth-user.decorator.js';
+import { Authenticated, PublicRoute } from '../decorators/authenticated.decorator.js';
+import { UseValidation } from '../decorators/use-validation.decorator.js';
 
 @ApiTags('OAuth')
 @Controller('oauth')

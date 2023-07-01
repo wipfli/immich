@@ -1,4 +1,4 @@
-import { JobService, MACHINE_LEARNING_ENABLED, SearchService, StorageService } from '@app/domain';
+import { JobService, MACHINE_LEARNING_ENABLED, SearchService, StorageService } from '@app/domain/index.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 

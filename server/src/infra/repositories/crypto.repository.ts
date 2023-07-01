@@ -1,4 +1,4 @@
-import { ICryptoRepository } from '@app/domain';
+import { ICryptoRepository } from '@app/domain/index.js';
 import { Injectable } from '@nestjs/common';
 import { compareSync, hash } from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';

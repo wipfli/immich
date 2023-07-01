@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
     "strict": true,
     "declaration": true,
     "removeComments": true,
@@ -8,14 +8,14 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "target": "es2017",
+    "target": "es2020",
     "moduleResolution": "node16",
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "@test": ["test"],
       "@test/*": ["test/*"],
@@ -27,5 +27,8 @@
       "@app/domain/*": ["src/domain/*"]
     }
   },
-  "exclude": ["dist", "node_modules", "upload"]
+  "exclude": ["dist", "node_modules", "upload"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }

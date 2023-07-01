@@ -12,9 +12,9 @@ import {
   StorageTemplateService,
   SystemConfigService,
   UserService,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import { Injectable, Logger } from '@nestjs/common';
-import { MetadataExtractionProcessor } from './processors/metadata-extraction.processor';
+import { MetadataExtractionProcessor } from './processors/metadata-extraction.processor.js';
 
 @Injectable()
 export class AppService {

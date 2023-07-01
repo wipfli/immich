@@ -1,8 +1,8 @@
-import { AssetFaceId, IFaceRepository } from '@app/domain';
+import { AssetFaceId, IFaceRepository } from '@app/domain/index.js';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AssetFaceEntity } from '../entities/asset-face.entity';
+import { AssetFaceEntity } from '../entities/asset-face.entity.js';
 
 @Injectable()
 export class FaceRepository implements IFaceRepository {

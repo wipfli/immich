@@ -1,4 +1,4 @@
-import { SystemConfigService } from '@app/domain';
+import { SystemConfigService } from '@app/domain/index.js';
 import axios from 'axios';
 import { Command, CommandRunner } from 'nest-commander';
 

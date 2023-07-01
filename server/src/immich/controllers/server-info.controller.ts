@@ -4,11 +4,11 @@ import {
   ServerPingResponse,
   ServerStatsResponseDto,
   ServerVersionReponseDto,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AdminRoute, Authenticated, PublicRoute } from '../decorators/authenticated.decorator';
-import { UseValidation } from '../decorators/use-validation.decorator';
+import { AdminRoute, Authenticated, PublicRoute } from '../decorators/authenticated.decorator.js';
+import { UseValidation } from '../decorators/use-validation.decorator.js';
 
 @ApiTags('Server Info')
 @Controller('server-info')

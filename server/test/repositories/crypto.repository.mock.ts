@@ -1,4 +1,4 @@
-import { ICryptoRepository } from '@app/domain';
+import { ICryptoRepository } from '@app/domain/index.js';
 
 export const newCryptoRepositoryMock = (): jest.Mocked<ICryptoRepository> => {
   return {

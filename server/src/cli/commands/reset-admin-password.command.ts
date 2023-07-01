@@ -1,4 +1,4 @@
-import { UserResponseDto, UserService } from '@app/domain';
+import { UserResponseDto, UserService } from '@app/domain/index.js';
 import { Command, CommandRunner, InquirerService, Question, QuestionSet } from 'nest-commander';
 
 @Command({

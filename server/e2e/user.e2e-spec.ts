@@ -1,4 +1,4 @@
-import { AuthService, AuthUserDto, CreateUserDto, UserResponseDto, UserService } from '@app/domain';
+import { AuthService, AuthUserDto, CreateUserDto, UserResponseDto, UserService } from '@app/domain/index.js';
 import { AppModule } from '@app/immich/app.module';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';

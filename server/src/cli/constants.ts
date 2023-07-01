@@ -1,4 +1,4 @@
-import { AuthUserDto } from '@app/domain';
+import { AuthUserDto } from '@app/domain/index.js';
 
 export const CLI_USER: AuthUserDto = {
   id: 'cli',

@@ -1,4 +1,4 @@
-import { SystemConfigService } from '@app/domain';
+import { SystemConfigService } from '@app/domain/index.js';
 import { Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 

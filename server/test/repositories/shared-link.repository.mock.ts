@@ -1,4 +1,4 @@
-import { ISharedLinkRepository } from '@app/domain';
+import { ISharedLinkRepository } from '@app/domain/index.js';
 
 export const newSharedLinkRepositoryMock = (): jest.Mocked<ISharedLinkRepository> => {
   return {

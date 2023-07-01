@@ -12,7 +12,7 @@ import {
   VideoFormat,
   VideoInfo,
   VideoStreamInfo,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import {
   AlbumEntity,
   APIKeyEntity,
@@ -30,7 +30,7 @@ import {
   TranscodePreset,
   UserEntity,
   UserTokenEntity,
-} from '@app/infra/entities';
+} from '@app/infra/entities/index.js';
 
 const today = new Date();
 const tomorrow = new Date();

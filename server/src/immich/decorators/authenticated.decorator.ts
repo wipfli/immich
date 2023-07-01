@@ -1,4 +1,4 @@
-import { IMMICH_API_KEY_NAME } from '@app/domain';
+import { IMMICH_API_KEY_NAME } from '@app/domain/index.js';
 import { applyDecorators, SetMetadata } from '@nestjs/common';
 import { ApiBearerAuth, ApiCookieAuth, ApiQuery, ApiSecurity } from '@nestjs/swagger';
 

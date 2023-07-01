@@ -5,7 +5,7 @@ import {
   SharedLinkCreateDto,
   SharedLinkResponseDto,
   UserService,
-} from '@app/domain';
+} from '@app/domain/index.js';
 import { AppModule } from '@app/immich/app.module';
 import { AuthUserDto } from '@app/immich/decorators/auth-user.decorator';
 import { SharedLinkType } from '@app/infra/entities';

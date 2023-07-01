@@ -1,4 +1,4 @@
-import { IFaceRepository } from '@app/domain';
+import { IFaceRepository } from '@app/domain/index.js';
 
 export const newFaceRepositoryMock = (): jest.Mocked<IFaceRepository> => {
   return {

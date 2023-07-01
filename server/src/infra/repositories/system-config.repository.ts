@@ -1,7 +1,7 @@
-import { ISystemConfigRepository } from '@app/domain';
+import { ISystemConfigRepository } from '@app/domain/index.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { SystemConfigEntity } from '../entities';
+import { SystemConfigEntity } from '../entities/index.js';
 
 export class SystemConfigRepository implements ISystemConfigRepository {
   constructor(

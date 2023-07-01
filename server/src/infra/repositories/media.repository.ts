@@ -1,4 +1,4 @@
-import { CropOptions, IMediaRepository, ResizeOptions, TranscodeOptions, VideoInfo } from '@app/domain';
+import { CropOptions, IMediaRepository, ResizeOptions, TranscodeOptions, VideoInfo } from '@app/domain/index.js';
 import ffmpeg, { FfprobeData } from 'fluent-ffmpeg';
 import fs from 'fs/promises';
 import sharp from 'sharp';

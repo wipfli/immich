@@ -1,4 +1,4 @@
-import { IAlbumRepository } from '@app/domain';
+import { IAlbumRepository } from '@app/domain/index.js';
 
 export const newAlbumRepositoryMock = (): jest.Mocked<IAlbumRepository> => {
   return {

@@ -1,4 +1,4 @@
-import { DiskUsage, ImmichReadStream, ImmichZipStream, IStorageRepository } from '@app/domain';
+import { DiskUsage, ImmichReadStream, ImmichZipStream, IStorageRepository } from '@app/domain/index.js';
 import archiver from 'archiver';
 import { constants, createReadStream, existsSync, mkdirSync } from 'fs';
 import fs from 'fs/promises';

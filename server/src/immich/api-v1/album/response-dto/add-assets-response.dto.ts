@@ -1,4 +1,4 @@
-import { AlbumResponseDto } from '@app/domain';
+import { AlbumResponseDto } from '@app/domain/index.js';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddAssetsResponseDto {

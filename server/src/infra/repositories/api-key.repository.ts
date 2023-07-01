@@ -1,8 +1,8 @@
-import { IKeyRepository } from '@app/domain';
+import { IKeyRepository } from '@app/domain/index.js';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { APIKeyEntity } from '../entities';
+import { APIKeyEntity } from '../entities/index.js';
 
 @Injectable()
 export class APIKeyRepository implements IKeyRepository {

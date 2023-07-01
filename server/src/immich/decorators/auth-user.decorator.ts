@@ -1,5 +1,5 @@
-export { AuthUserDto } from '@app/domain';
-import { AuthUserDto, LoginDetails } from '@app/domain';
+export { AuthUserDto } from '@app/domain/index.js';
+import { AuthUserDto, LoginDetails } from '@app/domain/index.js';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { UAParser } from 'ua-parser-js';

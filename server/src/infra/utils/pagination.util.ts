@@ -1,4 +1,4 @@
-import { Paginated, PaginationOptions } from '@app/domain';
+import { Paginated, PaginationOptions } from '@app/domain/index.js';
 import { FindOneOptions, ObjectLiteral, Repository } from 'typeorm';
 
 export async function paginate<Entity extends ObjectLiteral>(
