@@ -80,6 +80,7 @@
     "sanitize-filename": "^1.6.3",
     "sharp": "^0.31.3",
     "thumbhash": "^0.1.1",
+    "ts-paths-esm-loader": "^1.4.3",
     "typeorm": "^0.3.11",
     "typesense": "^1.5.3",
     "ua-parser-js": "^1.0.35"

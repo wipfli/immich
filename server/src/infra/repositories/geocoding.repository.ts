@@ -2,10 +2,11 @@ import { GeoPoint, IGeocodingRepository, ReverseGeocodeResult } from '@app/domai
 import { localGeocodingConfig } from '@app/infra/index.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { readdir, rm } from 'fs/promises';
-import { getName } from 'i18n-iso-countries';
+import pkg from 'i18n-iso-countries';
 import geocoderDefault, { AddressObject } from 'local-reverse-geocoder';
 import path from 'path';
 import { promisify } from 'util';
+const { getName } = pkg;
 
 // I don't know.
 const geocoder = geocoderDefault.default;

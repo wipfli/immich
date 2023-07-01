@@ -1,5 +1,3 @@
-import 'module-alias/register.js';
-
 import { bootstrap as cli } from './cli/immich.js';
 import { bootstrap as immich } from './immich/main.js';
 import { bootstrap as microservices } from './microservices/main.js';

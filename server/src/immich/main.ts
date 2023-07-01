@@ -3,11 +3,12 @@ import { RedisIoAdapter } from '@app/infra/index.js';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { json } from 'body-parser';
+import pkg from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
 import { AppService } from './app.service.js';
 import { useSwagger } from './app.utils.js';
+const { json } = pkg;
 
 const logger = new Logger('ImmichServer');
 const envName = (process.env.NODE_ENV || 'development').toUpperCase();

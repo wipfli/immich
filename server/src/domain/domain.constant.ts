@@ -1,7 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
-import pkg from 'src/../../package.json';
+// the 'src' in this import breaks things
+// import pkg from 'src/../../package.json';
 
-const [major, minor, patch] = pkg.version.split('.');
+const [major, minor, patch] = ['1', '65', '0'];
+// const [major, minor, patch] = pkg.version.split('.');
 
 export interface IServerVersion {
   major: number;
