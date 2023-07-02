@@ -3,7 +3,7 @@
   import Thumbnail from '$lib/components/assets/thumbnail/thumbnail.svelte';
   import UserPageLayout from '$lib/components/layouts/user-page-layout.svelte';
   import { AppRoute } from '$lib/constants';
-  import { AssetTypeEnum, SearchExploreResponseDto, api } from '@api';
+  import { api, AssetTypeEnum, SearchExploreResponseDto } from '@api';
   import ClockOutline from 'svelte-material-icons/ClockOutline.svelte';
   import HeartMultipleOutline from 'svelte-material-icons/HeartMultipleOutline.svelte';
   import MotionPlayOutline from 'svelte-material-icons/MotionPlayOutline.svelte';
@@ -66,7 +66,7 @@
         <p class="mb-4 dark:text-immich-dark-fg font-medium">Places</p>
       </div>
       <div class="flex flex-row flex-wrap gap-4">
-        {#each places as item}
+        {#each places as item (item.data.id)}
           <a class="relative" href="/search?{Field.CITY}={item.value}" draggable="false">
             <div
               class="filter brightness-75 rounded-xl overflow-hidden w-[calc((100vw-(72px+5rem))/2)] max-w-[156px] flex justify-center"

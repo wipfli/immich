@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { imageLoad } from '$lib/utils/image-load';
+  import { Buffer } from 'buffer';
+  import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { thumbHashToDataURL } from 'thumbhash';
-  import { Buffer } from 'buffer';
 
   export let url: string;
   export let altText: string;
@@ -13,10 +13,24 @@
   export let shadow = false;
   export let circle = false;
 
+  let img: HTMLImageElement;
   let complete = false;
+
+  onMount(async () => {
+    console.log(`${url}: mount`);
+    try {
+      await img.decode();
+    } catch (e) {
+      console.log(`${url}: error: ${e}`);
+    }
+    console.log(`${url}: decoded`);
+    await tick();
+    complete = true;
+  });
 </script>
 
 <img
+  bind:this={img}
   style:width={widthStyle}
   style:height={heightStyle}
   src={url}
@@ -27,8 +41,6 @@
   class:rounded-full={circle}
   class:opacity-0={!thumbhash && !complete}
   draggable="false"
-  use:imageLoad
-  on:image-load|once={() => (complete = true)}
 />
 
 {#if thumbhash && !complete}

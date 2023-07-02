@@ -4,8 +4,8 @@
 </script>
 
 <script lang="ts">
-  import { imageLoad } from '$lib/utils/image-load';
   import { api, UserResponseDto } from '@api';
+  import { onMount, tick } from 'svelte';
 
   export let user: UserResponseDto;
   export let color: Color = 'primary';
@@ -14,7 +14,19 @@
   export let interactive = false;
   export let showTitle = true;
   export let autoColor = false;
+
+  let img: HTMLImageElement;
   let showFallback = true;
+
+  onMount(async () => {
+    if (!user.profileImagePath) {
+      return;
+    }
+
+    await img.decode();
+    await tick();
+    showFallback = false;
+  });
 
   const colorClasses: Record<Color, string> = {
     primary: 'bg-immich-primary dark:bg-immich-dark-primary text-immich-dark-fg dark:text-immich-fg',
@@ -55,13 +67,12 @@
 >
   {#if user.profileImagePath}
     <img
+      bind:this={img}
       src={api.getProfileImageUrl(user.id)}
       alt="Profile image of {title}"
       class="object-cover w-full h-full"
       class:hidden={showFallback}
       draggable="false"
-      use:imageLoad
-      on:image-load={() => (showFallback = false)}
     />
   {/if}
   {#if showFallback}
