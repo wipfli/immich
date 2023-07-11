@@ -21,8 +21,11 @@ ENV NODE_ENV=production \
   PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
   PATH="/opt/venv/bin:$PATH" \
-  PYTHONPATH=/usr/src
+  PYTHONPATH=/usr/src \
+  MACHINE_LEARNING_HOST=0.0.0.0 \
+  MACHINE_LEARNING_PORT=3003
 
 COPY --from=builder /opt/venv /opt/venv
 COPY app .
-ENTRYPOINT ["python", "-m", "app.main"]
+COPY entrypoint.sh .
+ENTRYPOINT ["./entrypoint.sh"]

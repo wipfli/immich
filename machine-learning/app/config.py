@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     workers: int = 1
     min_face_score: float = 0.7
     test_full: bool = False
+    shutdown_poll_s: int = 10
 
     class Config(BaseSettings.Config):
         env_prefix = "MACHINE_LEARNING_"
