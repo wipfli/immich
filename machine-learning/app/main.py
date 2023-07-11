@@ -31,7 +31,7 @@ app = FastAPI()
 def init_state() -> None:
     app.state.last_called = None
     app.state.model_cache = ModelCache(ttl=settings.model_ttl, revalidate=settings.model_ttl > 0)
-    app.state.thread_pool = ThreadPoolExecutor()
+    app.state.thread_pool = ThreadPoolExecutor(max_workers=os.cpu_count() or 4)
 
 
 @app.on_event("startup")

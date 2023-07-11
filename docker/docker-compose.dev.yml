@@ -31,11 +31,11 @@ services:
     build:
       context: ../machine-learning
       dockerfile: Dockerfile
-    command: python main.py
+    entrypoint: ../entrypoint.sh
     ports:
       - 3003:3003
     volumes:
-      - ../machine-learning/app:/usr/src/app
+      - ../machine-learning:/usr/src
       - model-cache:/cache
     env_file:
       - .env
