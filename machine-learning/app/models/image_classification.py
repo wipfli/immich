@@ -6,7 +6,7 @@ from transformers.pipelines import pipeline
 
 from ..config import settings
 from ..schemas import ModelType
-from .base import InferenceModel
+from .base import InferenceModel, batched
 
 
 class ImageClassifier(InferenceModel):
@@ -29,8 +29,15 @@ class ImageClassifier(InferenceModel):
             model_kwargs={"cache_dir": self.cache_dir, **model_kwargs},
         )
 
-    def predict(self, image: Image) -> list[str]:
-        predictions: list[dict[str, Any]] = self.model(image)  # type: ignore
-        tags = [tag for pred in predictions for tag in pred["label"].split(", ") if pred["score"] >= self.min_score]
+    @batched()
+    async def predict(self, inputs: list[Any]) -> list[Any]:
+        return self._predict_batch(inputs)
 
-        return tags
+    def _predict_batch(self, images: list[Image]) -> list[list[str]]:
+        batch_predictions: list[list[dict[str, Any]]] = self.model(images)  # type: ignore
+        results = [self._postprocess(predictions) for predictions in batch_predictions]
+
+        return results
+
+    def _postprocess(self, predictions: list[dict[str, Any]]) -> list[str]:
+        return [tag for pred in predictions for tag in pred["label"].split(", ") if pred["score"] >= self.min_score]

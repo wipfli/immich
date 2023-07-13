@@ -14,7 +14,6 @@ from PIL import Image
 from app.models.cache import ModelCache
 
 from .config import settings
-from .models.base import InferenceModel
 from .schemas import (
     EmbeddingResponse,
     FaceResponse,
@@ -69,7 +68,7 @@ async def image_classification(
     image: Image.Image = Depends(dep_pil_image),
 ) -> list[str]:
     model = await app.state.model_cache.get(settings.classification_model, ModelType.IMAGE_CLASSIFICATION)
-    labels = await run_in_thread(model, image)
+    labels = await model.predict(model, image)
     return labels
 
 
@@ -82,7 +81,7 @@ async def clip_encode_image(
     image: Image.Image = Depends(dep_pil_image),
 ) -> list[float]:
     model = await app.state.model_cache.get(settings.clip_image_model, ModelType.CLIP)
-    embedding = await run_in_thread(model, image)
+    embedding = await model.predict(image)
     return embedding
 
 
@@ -93,7 +92,8 @@ async def clip_encode_image(
 )
 async def clip_encode_text(payload: TextModelRequest) -> list[float]:
     model = await app.state.model_cache.get(settings.clip_text_model, ModelType.CLIP)
-    embedding = await run_in_thread(model, payload.text)
+    embedding = await model.predict(payload.text)
+    print(embedding)
     return embedding
 
 
@@ -106,14 +106,14 @@ async def facial_recognition(
     image: cv2.Mat = Depends(dep_cv_image),
 ) -> list[dict[str, Any]]:
     model = await app.state.model_cache.get(settings.facial_recognition_model, ModelType.FACIAL_RECOGNITION)
-    faces = await run_in_thread(model, image)
+    faces = await model.predict(model, image)
     return faces
 
 
-async def run_in_thread(model: InferenceModel, inputs) -> Any:
-    outputs = await asyncio.get_running_loop().run_in_executor(app.state.thread_pool, lambda: model.predict(inputs))
-    app.state.last_called = time.time()
-    return outputs
+# async def run_in_thread(model: InferenceModel, inputs) -> Any:
+#     outputs = await asyncio.get_running_loop().run_in_executor(app.state.thread_pool, lambda: model.predict(inputs))
+#     app.state.last_called = time.time()
+#     return outputs
 
 
 async def schedule_idle_shutdown() -> None:

@@ -15,6 +15,7 @@ from .models.image_classification import ImageClassifier
 from .schemas import ModelType
 
 
+@pytest.mark.asyncio
 class TestImageClassifier:
     def test_init(self, mock_classifier_pipeline: mock.Mock) -> None:
         cache_dir = Path("test_cache")
@@ -27,12 +28,12 @@ class TestImageClassifier:
             model_kwargs={"cache_dir": cache_dir},
         )
 
-    def test_min_score(self, pil_image: Image.Image, mock_classifier_pipeline: mock.Mock) -> None:
+    async def test_min_score(self, pil_image: Image.Image, mock_classifier_pipeline: mock.Mock) -> None:
         classifier = ImageClassifier("test_model_name", min_score=0.0)
         classifier.min_score = 0.0
-        all_labels = classifier.predict(pil_image)
+        all_labels = await classifier.predict(pil_image)
         classifier.min_score = 0.5
-        filtered_labels = classifier.predict(pil_image)
+        filtered_labels = await classifier.predict(pil_image)
 
         assert all_labels == [
             "that's an image alright",
@@ -45,24 +46,25 @@ class TestImageClassifier:
         assert filtered_labels == ["that's an image alright"]
 
 
+@pytest.mark.asyncio
 class TestCLIP:
     def test_init(self, mock_st: mock.Mock) -> None:
         CLIPSTEncoder("test_model_name", cache_dir="test_cache")
 
         mock_st.assert_called_once_with("test_model_name", cache_folder="test_cache")
 
-    def test_basic_image(self, pil_image: Image.Image, mock_st: mock.Mock) -> None:
+    async def test_basic_image(self, pil_image: Image.Image, mock_st: mock.Mock) -> None:
         clip_encoder = CLIPSTEncoder("test_model_name", cache_dir="test_cache")
-        embedding = clip_encoder.predict(pil_image)
+        embedding = await clip_encoder.predict(pil_image)
 
         assert isinstance(embedding, list)
         assert len(embedding) == 512
         assert all([isinstance(num, float) for num in embedding])
         mock_st.assert_called_once()
 
-    def test_basic_text(self, mock_st: mock.Mock) -> None:
+    async def test_basic_text(self, mock_st: mock.Mock) -> None:
         clip_encoder = CLIPSTEncoder("test_model_name", cache_dir="test_cache")
-        embedding = clip_encoder.predict("test search query")
+        embedding = await clip_encoder.predict("test search query")
 
         assert isinstance(embedding, list)
         assert len(embedding) == 512
@@ -70,6 +72,7 @@ class TestCLIP:
         mock_st.assert_called_once()
 
 
+@pytest.mark.asyncio
 class TestFaceRecognition:
     def test_init(self, mock_faceanalysis: mock.Mock) -> None:
         FaceRecognizer("test_model_name", cache_dir="test_cache")
@@ -80,9 +83,9 @@ class TestFaceRecognition:
             allowed_modules=["detection", "recognition"],
         )
 
-    def test_basic(self, cv_image: cv2.Mat, mock_faceanalysis: mock.Mock) -> None:
+    async def test_basic(self, cv_image: cv2.Mat, mock_faceanalysis: mock.Mock) -> None:
         face_recognizer = FaceRecognizer("test_model_name", min_score=0.0, cache_dir="test_cache")
-        faces = face_recognizer.predict(cv_image)
+        faces = await face_recognizer.predict(cv_image)
 
         assert len(faces) == 2
         for face in faces:

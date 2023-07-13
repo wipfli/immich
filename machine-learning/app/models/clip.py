@@ -1,11 +1,10 @@
-from pathlib import Path
 from typing import Any
 
 from PIL.Image import Image
 from sentence_transformers import SentenceTransformer
 
 from ..schemas import ModelType
-from .base import InferenceModel
+from .base import InferenceModel, batched
 
 
 class CLIPSTEncoder(InferenceModel):
@@ -18,5 +17,12 @@ class CLIPSTEncoder(InferenceModel):
             **model_kwargs,
         )
 
-    def predict(self, image_or_text: Image | str) -> list[float]:
-        return self.model.encode(image_or_text).tolist()
+    @batched()
+    async def predict(self, inputs: list[Any]) -> list[Any]:
+        return self._predict_batch(inputs)
+
+    def _predict_batch(
+        self,
+        images_or_texts: list[Image] | list[str],
+    ) -> list[list[float]]:
+        return self.model.encode(images_or_texts).tolist()

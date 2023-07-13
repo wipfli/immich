@@ -2693,6 +2693,61 @@
         ]
       }
     },
+    "/person/{id}/merge": {
+      "post": {
+        "operationId": "mergePerson",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergePersonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BulkIdResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Person"
+        ],
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/person/{id}/thumbnail": {
       "get": {
         "operationId": "getPersonThumbnail",
@@ -4963,6 +5018,30 @@
           "deviceOS"
         ]
       },
+      "BulkIdResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "duplicate",
+              "no_permission",
+              "not_found",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "success"
+        ]
+      },
       "ChangePasswordDto": {
         "type": "object",
         "properties": {
@@ -5069,9 +5148,6 @@
       "CreateAssetDto": {
         "type": "object",
         "properties": {
-          "assetType": {
-            "$ref": "#/components/schemas/AssetTypeEnum"
-          },
           "assetData": {
             "type": "string",
             "format": "binary"
@@ -5087,9 +5163,6 @@
           "isReadOnly": {
             "type": "boolean",
             "default": false
-          },
-          "fileExtension": {
-            "type": "string"
           },
           "deviceAssetId": {
             "type": "string"
@@ -5119,9 +5192,7 @@
           }
         },
         "required": [
-          "assetType",
           "assetData",
-          "fileExtension",
           "deviceAssetId",
           "deviceId",
           "fileCreatedAt",
@@ -5492,9 +5563,6 @@
       "ImportAssetDto": {
         "type": "object",
         "properties": {
-          "assetType": {
-            "$ref": "#/components/schemas/AssetTypeEnum"
-          },
           "isReadOnly": {
             "type": "boolean",
             "default": true
@@ -5533,7 +5601,6 @@
           }
         },
         "required": [
-          "assetType",
           "assetPath",
           "deviceAssetId",
           "deviceId",
@@ -5754,6 +5821,21 @@
         "required": [
           "title",
           "assets"
+        ]
+      },
+      "MergePersonDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "ids"
         ]
       },
       "OAuthCallbackDto": {
@@ -6359,6 +6441,9 @@
           "transcode": {
             "$ref": "#/components/schemas/TranscodePolicy"
           },
+          "accel": {
+            "$ref": "#/components/schemas/TranscodeHWAccel"
+          },
           "preset": {
             "type": "string"
           },
@@ -6378,6 +6463,7 @@
           "targetVideoCodec",
           "targetAudioCodec",
           "transcode",
+          "accel",
           "preset",
           "targetResolution",
           "maxBitrate",
@@ -6599,6 +6685,15 @@
         "enum": [
           "day",
           "month"
+        ]
+      },
+      "TranscodeHWAccel": {
+        "type": "string",
+        "enum": [
+          "nvenc",
+          "qsv",
+          "vaapi",
+          "disabled"
         ]
       },
       "TranscodePolicy": {
