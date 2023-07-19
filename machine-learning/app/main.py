@@ -4,13 +4,13 @@ import sys
 import time
 from io import BytesIO
 from typing import Any
-from app.models.base import InferenceModel
 
 import cv2
 import numpy as np
 from fastapi import Body, Depends, FastAPI
 from PIL import Image
 
+from app.models.base import InferenceModel
 from app.models.cache import ModelCache
 
 from .config import settings
