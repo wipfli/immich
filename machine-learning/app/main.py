@@ -1,16 +1,19 @@
+import asyncio
 import os
+import sys
+import time
 from io import BytesIO
 from typing import Any
+from app.models.base import InferenceModel
 
 import cv2
 import numpy as np
-import uvicorn
 from fastapi import Body, Depends, FastAPI
 from PIL import Image
 
+from app.models.cache import ModelCache
+
 from .config import settings
-from .models.base import InferenceModel
-from .models.cache import ModelCache
 from .schemas import (
     EmbeddingResponse,
     FaceResponse,
@@ -25,29 +28,27 @@ app = FastAPI()
 
 
 def init_state() -> None:
+    app.state.last_called = None
     app.state.model_cache = ModelCache(ttl=settings.model_ttl, revalidate=settings.model_ttl > 0)
-
-
-async def load_models() -> None:
-    models = [
-        (settings.classification_model, ModelType.IMAGE_CLASSIFICATION),
-        (settings.clip_image_model, ModelType.CLIP),
-        (settings.clip_text_model, ModelType.CLIP),
-        (settings.facial_recognition_model, ModelType.FACIAL_RECOGNITION),
-    ]
-
-    # Get all models
-    for model_name, model_type in models:
-        if settings.eager_startup:
-            await app.state.model_cache.get(model_name, model_type)
-        else:
-            InferenceModel.from_model_type(model_type, model_name)
 
 
 @app.on_event("startup")
 async def startup_event() -> None:
     init_state()
-    await load_models()
+
+    if settings.eager_startup:
+        models = [
+            (settings.classification_model, ModelType.IMAGE_CLASSIFICATION),
+            (settings.clip_image_model, ModelType.CLIP),
+            (settings.clip_text_model, ModelType.CLIP),
+            (settings.facial_recognition_model, ModelType.FACIAL_RECOGNITION),
+        ]
+
+        for model_name, model_type in models:
+            await app.state.model_cache.get(model_name, model_type)
+
+    elif settings.model_ttl > 0:
+        await schedule_idle_shutdown()
 
 
 def dep_pil_image(byte_image: bytes = Body(...)) -> Image.Image:
@@ -78,7 +79,7 @@ async def image_classification(
     image: Image.Image = Depends(dep_pil_image),
 ) -> list[str]:
     model = await app.state.model_cache.get(settings.classification_model, ModelType.IMAGE_CLASSIFICATION)
-    labels = model.predict(image)
+    labels = predict(model, image)
     return labels
 
 
@@ -91,7 +92,7 @@ async def clip_encode_image(
     image: Image.Image = Depends(dep_pil_image),
 ) -> list[float]:
     model = await app.state.model_cache.get(settings.clip_image_model, ModelType.CLIP)
-    embedding = model.predict(image)
+    embedding = predict(model, image)
     return embedding
 
 
@@ -102,7 +103,7 @@ async def clip_encode_image(
 )
 async def clip_encode_text(payload: TextModelRequest) -> list[float]:
     model = await app.state.model_cache.get(settings.clip_text_model, ModelType.CLIP)
-    embedding = model.predict(payload.text)
+    embedding = predict(model, payload.text)
     return embedding
 
 
@@ -115,16 +116,34 @@ async def facial_recognition(
     image: cv2.Mat = Depends(dep_cv_image),
 ) -> list[dict[str, Any]]:
     model = await app.state.model_cache.get(settings.facial_recognition_model, ModelType.FACIAL_RECOGNITION)
-    faces = model.predict(image)
+    faces = predict(model, image)
     return faces
 
 
-if __name__ == "__main__":
-    is_dev = os.getenv("NODE_ENV") == "development"
-    uvicorn.run(
-        "app.main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=is_dev,
-        workers=settings.workers,
-    )
+def predict(model: InferenceModel, inputs: Any) -> Any:
+    app.state.last_called = time.time()
+    return model.predict(inputs)
+
+
+async def schedule_idle_shutdown() -> None:
+    async def idle_shutdown() -> None:
+        while True:
+            if app.state.last_called is not None and time.time() - app.state.last_called > settings.model_ttl:
+                loop = asyncio.get_running_loop()
+                for task in asyncio.all_tasks(loop):
+                    if task is not asyncio.current_task():
+                        try:
+                            task.cancel()
+                        except asyncio.CancelledError:
+                            pass
+                sys.stderr.close()
+                sys.stdout.close()
+                sys.stdout = sys.stderr = open(os.devnull, "w")
+                try:
+                    loop.stop()
+                except asyncio.CancelledError:
+                    pass
+            await asyncio.sleep(settings.shutdown_poll_s)
+
+    task = asyncio.get_running_loop().create_task(idle_shutdown())
+    asyncio.ensure_future(task)

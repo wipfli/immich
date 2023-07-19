@@ -12,13 +12,14 @@ class Settings(BaseSettings):
     clip_text_model: str = "clip-ViT-B-32"
     facial_recognition_model: str = "buffalo_l"
     min_tag_score: float = 0.9
-    eager_startup: bool = True
-    model_ttl: int = 0
+    eager_startup: bool = False
+    model_ttl: int = 300
     host: str = "0.0.0.0"
     port: int = 3003
     workers: int = 1
     min_face_score: float = 0.7
     test_full: bool = False
+    shutdown_poll_s: float = 10.0
 
     class Config(BaseSettings.Config):
         env_prefix = "MACHINE_LEARNING_"

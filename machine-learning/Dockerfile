@@ -25,4 +25,5 @@ ENV NODE_ENV=production \
 
 COPY --from=builder /opt/venv /opt/venv
 COPY app .
-ENTRYPOINT ["python", "-m", "app.main"]
+COPY entrypoint.sh .
+ENTRYPOINT ["./entrypoint.sh"]
