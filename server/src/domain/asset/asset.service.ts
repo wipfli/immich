@@ -299,14 +299,12 @@ export class AssetService {
     }
 
     const asset = await this.assetRepository.save({ id, ...rest });
-    await this.jobRepository.queue({ name: JobName.SEARCH_INDEX_ASSET, data: { ids: [id] } });
     return mapAsset(asset);
   }
 
   async updateAll(authUser: AuthUserDto, dto: AssetBulkUpdateDto) {
     const { ids, ...options } = dto;
     await this.access.requirePermission(authUser, Permission.ASSET_UPDATE, ids);
-    await this.jobRepository.queue({ name: JobName.SEARCH_INDEX_ASSET, data: { ids } });
     await this.assetRepository.updateAll(ids, options);
   }
 

@@ -1,4 +1,7 @@
 import {
+  AssetBuilderOptions,
+  AssetExploreFieldOptions,
+  AssetExploreOptions,
   AssetSearchOptions,
   AssetStats,
   AssetStatsOptions,
@@ -8,6 +11,8 @@ import {
   MapMarkerSearchOptions,
   Paginated,
   PaginationOptions,
+  SearchExploreItem,
+  SearchExploreItemSet,
   TimeBucketItem,
   TimeBucketOptions,
   TimeBucketSize,
@@ -19,8 +24,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { FindOptionsRelations, FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import { AssetEntity, AssetType, ExifEntity } from '../entities';
-import OptionalBetween from '../utils/optional-between.util';
-import { paginate } from '../utils/pagination.util';
+import { OptionalBetween, paginate } from '../infra.utils.ts';
 
 const truncateMap: Record<TimeBucketSize, string> = {
   [TimeBucketSize.DAY]: 'day',
@@ -459,13 +463,33 @@ export class AssetRepository implements IAssetRepository {
       .getMany();
   }
 
-  private getBuilder(options: TimeBucketOptions) {
-    const { isArchived, isFavorite, albumId, personId, userId } = options;
+  async getAssetIdsByCity(userId: string, options: AssetExploreFieldOptions): Promise<SearchExploreItem<string>> {
+    const items = await this.getAssetIdsByField(userId, { ...options, relation: 'exifInfo', relatedField: 'city' });
+    return { fieldName: 'city', items };
+  }
 
-    let builder = this.repository
-      .createQueryBuilder('asset')
-      .where('asset.isVisible = true')
-      .leftJoinAndSelect('asset.exifInfo', 'exifInfo');
+  async getAssetIdsByTag(userId: string, options: AssetExploreFieldOptions): Promise<SearchExploreItem<string>> {
+    const items = await this.getAssetIdsByField(userId, {
+      ...options,
+      relation: 'smartInfo',
+      relatedField: 'tags',
+      unnest: true,
+    });
+    return { fieldName: 'tags', items };
+  }
+
+  private getBuilder(options: AssetBuilderOptions) {
+    const { isArchived, isFavorite, albumId, personId, userId, exifInfo, assetType } = options;
+
+    let builder = this.repository.createQueryBuilder('asset').where('asset.isVisible = true');
+
+    if (assetType !== undefined) {
+      builder = builder.andWhere('asset.type = :assetType', { assetType });
+    }
+
+    if (exifInfo !== false) {
+      builder = builder.leftJoinAndSelect('asset.exifInfo', 'exifInfo');
+    }
 
     if (albumId) {
       builder = builder.leftJoin('asset.albums', 'album').andWhere('album.id = :albumId', { albumId });
@@ -491,5 +515,19 @@ export class AssetRepository implements IAssetRepository {
     }
 
     return builder;
+  }
+
+  private getAssetIdsByField(userId: string, options: AssetExploreOptions): Promise<SearchExploreItemSet<string>> {
+    const { relation, relatedField, unnest, maxFields, minAssetsPerField } = options;
+    const select = unnest ? `unnest(r.${relatedField})` : `r.${relatedField}`;
+    return this.getBuilder({ userId, exifInfo: false, assetType: AssetType.IMAGE, isArchived: false })
+      .select(select, 'value')
+      .addSelect(`any_value(asset.id)`, 'data')
+      .innerJoin(`asset.${relation}`, 'r')
+      .groupBy('value')
+      .having('count(*) >= :minAssetsPerField', { minAssetsPerField })
+      .orderBy('random()')
+      .limit(maxFields)
+      .getRawMany();
   }
 }

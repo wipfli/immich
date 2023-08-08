@@ -443,16 +443,7 @@ export class LibraryService {
       const asset = await this.assetRepository.getById(assetId);
       this.logger.debug(`Removing asset from library: ${asset.originalPath}`);
 
-      if (asset.faces) {
-        await Promise.all(
-          asset.faces.map(({ assetId, personId }) =>
-            this.jobRepository.queue({ name: JobName.SEARCH_REMOVE_FACE, data: { assetId, personId } }),
-          ),
-        );
-      }
-
       await this.assetRepository.remove(asset);
-      await this.jobRepository.queue({ name: JobName.SEARCH_REMOVE_ASSET, data: { ids: [asset.id] } });
 
       await this.jobRepository.queue({
         name: JobName.DELETE_FILES,

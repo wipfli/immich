@@ -13,7 +13,7 @@ import {
 } from '@test';
 import _ from 'lodash';
 import { BulkIdErrorReason, IAssetRepository } from '../asset';
-import { IJobRepository, JobName } from '../job';
+import { IJobRepository } from '../job';
 import { IUserRepository } from '../user';
 import { IAlbumRepository } from './album.repository';
 import { AlbumService } from './album.service';
@@ -244,10 +244,6 @@ describe(AlbumService.name, () => {
       expect(albumMock.update).toHaveBeenCalledWith({
         id: 'album-4',
         albumName: 'new album name',
-      });
-      expect(jobMock.queue).toHaveBeenCalledWith({
-        name: JobName.SEARCH_INDEX_ALBUM,
-        data: { ids: [albumStub.oneAsset.id] },
       });
     });
   });

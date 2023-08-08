@@ -1,3 +1,4 @@
+import { SearchExploreItem, SearchFacet } from '@app/domain';
 import { AssetEntity } from '@app/infra/entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
