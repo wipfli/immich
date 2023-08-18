@@ -16,8 +16,10 @@
   import { AssetAction } from '$lib/constants';
   import { createAssetInteractionStore } from '$lib/stores/asset-interaction.store';
   import { AssetStore } from '$lib/stores/assets.store';
+  import { websocketStore } from '$lib/stores/websocket';
   import { openFileUploadDialog } from '$lib/utils/file-uploader';
   import { TimeBucketSize } from '@api';
+  import { onDestroy } from 'svelte';
   import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
   import Plus from 'svelte-material-icons/Plus.svelte';
   import type { PageData } from './$types';
@@ -29,6 +31,13 @@
   const { isMultiSelectState, selectedAssets } = assetInteractionStore;
 
   $: isAllFavorite = Array.from($selectedAssets).every((asset) => asset.isFavorite);
+
+  const wsPageUnsubscriber = websocketStore.onUploadSuccess.subscribe((asset) => {
+    if (!asset) return;
+    console.log('I got a new asset upload here', asset);
+  });
+
+  onDestroy(() => wsPageUnsubscriber());
 </script>
 
 <UserPageLayout user={data.user} hideNavbar={$isMultiSelectState} showUploadButton>
