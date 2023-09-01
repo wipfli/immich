@@ -2,8 +2,10 @@ import {
   AccessCore,
   AssetResponseDto,
   AuthUserDto,
+  CommunicationEvent,
   getLivePhotoMotionFilename,
   IAccessRepository,
+  ICommunicationRepository,
   ICryptoRepository,
   IJobRepository,
   IStorageRepository,
@@ -63,6 +65,7 @@ export class AssetService {
     @Inject(IAccessRepository) accessRepository: IAccessRepository,
     @Inject(IAssetRepository) private _assetRepository: IAssetRepository,
     @InjectRepository(AssetEntity) private assetRepository: Repository<AssetEntity>,
+    @Inject(ICommunicationRepository) private communicationRepository: ICommunicationRepository,
     @Inject(ICryptoRepository) private cryptoRepository: ICryptoRepository,
     @Inject(IJobRepository) private jobRepository: IJobRepository,
     @Inject(IStorageRepository) private storageRepository: IStorageRepository,
@@ -274,6 +277,7 @@ export class AssetService {
 
         await this._assetRepository.remove(asset);
         await this.jobRepository.queue({ name: JobName.SEARCH_REMOVE_ASSET, data: { ids: [id] } });
+        this.communicationRepository.send(CommunicationEvent.ASSET_DELETE, asset.ownerId, id);
 
         result.push({ id, status: DeleteAssetStatusEnum.SUCCESS });
 

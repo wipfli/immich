@@ -1,4 +1,4 @@
-import { ICryptoRepository, IJobRepository, IStorageRepository, JobName } from '@app/domain';
+import { ICommunicationRepository, ICryptoRepository, IJobRepository, IStorageRepository, JobName } from '@app/domain';
 import { AssetEntity, AssetType, ExifEntity } from '@app/infra/entities';
 import { BadRequestException } from '@nestjs/common';
 import {
@@ -7,6 +7,7 @@ import {
   authStub,
   fileStub,
   newAccessRepositoryMock,
+  newCommunicationRepositoryMock,
   newCryptoRepositoryMock,
   newJobRepositoryMock,
   newStorageRepositoryMock,
@@ -86,6 +87,7 @@ describe('AssetService', () => {
   let a: Repository<AssetEntity>; // TO BE DELETED AFTER FINISHED REFACTORING
   let accessMock: IAccessRepositoryMock;
   let assetRepositoryMock: jest.Mocked<IAssetRepository>;
+  let communicationMock: jest.Mocked<ICommunicationRepository>;
   let cryptoMock: jest.Mocked<ICryptoRepository>;
   let jobMock: jest.Mocked<IJobRepository>;
   let storageMock: jest.Mocked<IStorageRepository>;
@@ -108,11 +110,12 @@ describe('AssetService', () => {
     };
 
     accessMock = newAccessRepositoryMock();
+    communicationMock = newCommunicationRepositoryMock();
     cryptoMock = newCryptoRepositoryMock();
     jobMock = newJobRepositoryMock();
     storageMock = newStorageRepositoryMock();
 
-    sut = new AssetService(accessMock, assetRepositoryMock, a, cryptoMock, jobMock, storageMock);
+    sut = new AssetService(accessMock, assetRepositoryMock, a, communicationMock, cryptoMock, jobMock, storageMock);
 
     when(assetRepositoryMock.get)
       .calledWith(assetStub.livePhotoStillAsset.id)
