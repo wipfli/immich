@@ -17,7 +17,6 @@
   import Scrollbar from '../shared-components/scrollbar/scrollbar.svelte';
   import ShowShortcuts from '../shared-components/show-shortcuts.svelte';
   import AssetDateGroup from './asset-date-group.svelte';
-  import { disableShortcut } from '$lib/stores/shortcut.store';
 
   export let isSelectionMode = false;
   export let singleSelect = false;
@@ -55,7 +54,11 @@
   });
 
   const handleKeyboardPress = (event: KeyboardEvent) => {
-    if ($isSearchEnabled || $disableShortcut) {
+    if (
+      $isSearchEnabled ||
+      (event.target as HTMLInputElement).type === 'textarea' ||
+      (event.target as HTMLInputElement).type === 'text'
+    ) {
       return;
     }
 

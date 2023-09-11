@@ -27,7 +27,6 @@
   import CircleIconButton from '../elements/buttons/circle-icon-button.svelte';
   import Close from 'svelte-material-icons/Close.svelte';
   import ProgressBar, { ProgressBarStatus } from '../shared-components/progress-bar/progress-bar.svelte';
-  import { disableShortcut } from '$lib/stores/shortcut.store';
 
   export let assetStore: AssetStore | null = null;
   export let asset: AssetResponseDto;
@@ -53,7 +52,7 @@
   let shouldShowDownloadButton = sharedLink ? sharedLink.allowDownload : true;
   let canCopyImagesToClipboard: boolean;
 
-  const onKeyboardPress = (keyInfo: KeyboardEvent) => handleKeyboardPress(keyInfo.key, keyInfo.shiftKey);
+  const onKeyboardPress = (event: KeyboardEvent) => handleKeyboardPress(event);
 
   onMount(async () => {
     document.addEventListener('keydown', onKeyboardPress);
@@ -89,15 +88,15 @@
     }
   };
 
-  const handleKeyboardPress = (key: string, shiftKey: boolean) => {
-    if ($disableShortcut) {
+  const handleKeyboardPress = (event: KeyboardEvent) => {
+    if ((event.target as HTMLInputElement).type === 'textarea' || (event.target as HTMLInputElement).type === 'text') {
       return;
     }
 
-    switch (key) {
+    switch (event.key) {
       case 'a':
       case 'A':
-        if (shiftKey) {
+        if (event.shiftKey) {
           toggleArchive();
         }
         return;
@@ -109,7 +108,7 @@
         return;
       case 'd':
       case 'D':
-        if (shiftKey) {
+        if (event.shiftKey) {
           downloadFile(asset);
         }
         return;
@@ -212,13 +211,12 @@
 
   const openAlbumPicker = (shared: boolean) => {
     isShowAlbumPicker = true;
-    $disableShortcut = true;
+
     addToSharedAlbum = shared;
   };
 
   const handleAddToNewAlbum = (event: CustomEvent) => {
     isShowAlbumPicker = false;
-    $disableShortcut = false;
 
     const { albumName }: { albumName: string } = event.detail;
     api.albumApi.createAlbum({ createAlbumDto: { albumName, assetIds: [asset.id] } }).then((response) => {
@@ -229,7 +227,7 @@
 
   const handleAddToAlbum = async (event: CustomEvent<{ album: AlbumResponseDto }>) => {
     isShowAlbumPicker = false;
-    $disableShortcut = false;
+
     const album = event.detail.album;
 
     await addAssetsToAlbum(album.id, [asset.id]);
@@ -457,10 +455,7 @@
       on:newAlbum={handleAddToNewAlbum}
       on:newSharedAlbum={handleAddToNewAlbum}
       on:album={handleAddToAlbum}
-      on:close={() => {
-        isShowAlbumPicker = false;
-        $disableShortcut = false;
-      }}
+      on:close={() => (isShowAlbumPicker = false)}
     />
   {/if}
 
