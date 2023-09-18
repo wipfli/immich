@@ -17,6 +17,7 @@ import {
   TimeBucketAssetDto,
   TimeBucketDto,
   TimeBucketResponseDto,
+  UpdateAssetStackDto,
   UpdateAssetDto as UpdateDto,
 } from '@app/domain';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, StreamableFile } from '@nestjs/common';
@@ -105,5 +106,11 @@ export class AssetController {
     @Body() dto: UpdateDto,
   ): Promise<AssetResponseDto> {
     return this.service.update(authUser, id, dto);
+  }
+
+  @Post('stack')
+  @HttpCode(HttpStatus.OK)
+  updateStack(@AuthUser() authUser: AuthUserDto, @Body() dto: UpdateAssetStackDto): Promise<void> {
+    return this.service.updateStack(authUser, dto);
   }
 }

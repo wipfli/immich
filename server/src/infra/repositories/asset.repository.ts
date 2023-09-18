@@ -445,17 +445,17 @@ export class AssetRepository implements IAssetRepository {
 
     return this.getBuilder(options)
       .select(`COUNT(asset.id)::int`, 'count')
-      .addSelect(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'timeBucket')
-      .groupBy(`date_trunc('${truncateValue}', "fileCreatedAt")`)
-      .orderBy(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'DESC')
+      .addSelect(`date_trunc('${truncateValue}', "asset"."fileCreatedAt")`, 'timeBucket')
+      .groupBy(`date_trunc('${truncateValue}', "asset"."fileCreatedAt")`)
+      .orderBy(`date_trunc('${truncateValue}', "asset"."fileCreatedAt")`, 'DESC')
       .getRawMany();
   }
 
   getByTimeBucket(timeBucket: string, options: TimeBucketOptions): Promise<AssetEntity[]> {
     const truncateValue = truncateMap[options.size];
     return this.getBuilder(options)
-      .andWhere(`date_trunc('${truncateValue}', "fileCreatedAt") = :timeBucket`, { timeBucket })
-      .orderBy('asset.fileCreatedAt', 'DESC')
+      .andWhere(`date_trunc('${truncateValue}', "asset"."fileCreatedAt") = :timeBucket`, { timeBucket })
+      .orderBy(`"asset"."fileCreatedAt"`, 'DESC')
       .getMany();
   }
 
@@ -490,6 +490,9 @@ export class AssetRepository implements IAssetRepository {
         .andWhere('person.id = :personId', { personId });
     }
 
+    if (!isArchived && !isFavorite && !personId) {
+      builder = builder.andWhere('asset.stackParent IS NULL').leftJoinAndSelect('asset.stack', 'stack');
+    }
     return builder;
   }
 }

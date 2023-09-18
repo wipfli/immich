@@ -35,6 +35,7 @@ class AssetResponseDto {
     this.people = const [],
     required this.resized,
     this.smartInfo,
+    this.stackParentId,
     this.tags = const [],
     required this.thumbhash,
     required this.type,
@@ -104,6 +105,8 @@ class AssetResponseDto {
   ///
   SmartInfoResponseDto? smartInfo;
 
+  String? stackParentId;
+
   List<TagResponseDto> tags;
 
   /// base64 encoded thumbhash
@@ -137,6 +140,7 @@ class AssetResponseDto {
      other.people == people &&
      other.resized == resized &&
      other.smartInfo == smartInfo &&
+     other.stackParentId == stackParentId &&
      other.tags == tags &&
      other.thumbhash == thumbhash &&
      other.type == type &&
@@ -167,13 +171,14 @@ class AssetResponseDto {
     (people.hashCode) +
     (resized.hashCode) +
     (smartInfo == null ? 0 : smartInfo!.hashCode) +
+    (stackParentId == null ? 0 : stackParentId!.hashCode) +
     (tags.hashCode) +
     (thumbhash == null ? 0 : thumbhash!.hashCode) +
     (type.hashCode) +
     (updatedAt.hashCode);
 
   @override
-  String toString() => 'AssetResponseDto[checksum=$checksum, deviceAssetId=$deviceAssetId, deviceId=$deviceId, duration=$duration, exifInfo=$exifInfo, fileCreatedAt=$fileCreatedAt, fileModifiedAt=$fileModifiedAt, id=$id, isArchived=$isArchived, isExternal=$isExternal, isFavorite=$isFavorite, isOffline=$isOffline, isReadOnly=$isReadOnly, libraryId=$libraryId, livePhotoVideoId=$livePhotoVideoId, originalFileName=$originalFileName, originalPath=$originalPath, owner=$owner, ownerId=$ownerId, people=$people, resized=$resized, smartInfo=$smartInfo, tags=$tags, thumbhash=$thumbhash, type=$type, updatedAt=$updatedAt]';
+  String toString() => 'AssetResponseDto[checksum=$checksum, deviceAssetId=$deviceAssetId, deviceId=$deviceId, duration=$duration, exifInfo=$exifInfo, fileCreatedAt=$fileCreatedAt, fileModifiedAt=$fileModifiedAt, id=$id, isArchived=$isArchived, isExternal=$isExternal, isFavorite=$isFavorite, isOffline=$isOffline, isReadOnly=$isReadOnly, libraryId=$libraryId, livePhotoVideoId=$livePhotoVideoId, originalFileName=$originalFileName, originalPath=$originalPath, owner=$owner, ownerId=$ownerId, people=$people, resized=$resized, smartInfo=$smartInfo, stackParentId=$stackParentId, tags=$tags, thumbhash=$thumbhash, type=$type, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -214,6 +219,11 @@ class AssetResponseDto {
       json[r'smartInfo'] = this.smartInfo;
     } else {
     //  json[r'smartInfo'] = null;
+    }
+    if (this.stackParentId != null) {
+      json[r'stackParentId'] = this.stackParentId;
+    } else {
+    //  json[r'stackParentId'] = null;
     }
       json[r'tags'] = this.tags;
     if (this.thumbhash != null) {
@@ -256,6 +266,7 @@ class AssetResponseDto {
         people: PersonResponseDto.listFromJson(json[r'people']),
         resized: mapValueOfType<bool>(json, r'resized')!,
         smartInfo: SmartInfoResponseDto.fromJson(json[r'smartInfo']),
+        stackParentId: mapValueOfType<String>(json, r'stackParentId'),
         tags: TagResponseDto.listFromJson(json[r'tags']),
         thumbhash: mapValueOfType<String>(json, r'thumbhash'),
         type: AssetTypeEnum.fromJson(json[r'type'])!,

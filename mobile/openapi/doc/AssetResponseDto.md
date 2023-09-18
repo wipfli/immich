@@ -30,6 +30,7 @@ Name | Type | Description | Notes
 **people** | [**List<PersonResponseDto>**](PersonResponseDto.md) |  | [optional] [default to const []]
 **resized** | **bool** |  | 
 **smartInfo** | [**SmartInfoResponseDto**](SmartInfoResponseDto.md) |  | [optional] 
+**stackParentId** | **String** |  | [optional] 
 **tags** | [**List<TagResponseDto>**](TagResponseDto.md) |  | [optional] [default to const []]
 **thumbhash** | **String** | base64 encoded thumbhash | 
 **type** | [**AssetTypeEnum**](AssetTypeEnum.md) |  | 
