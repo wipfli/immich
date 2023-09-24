@@ -30,7 +30,8 @@ class Asset {
         exifInfo =
             remote.exifInfo != null ? ExifInfo.fromDto(remote.exifInfo!) : null,
         isFavorite = remote.isFavorite,
-        isArchived = remote.isArchived;
+        isArchived = remote.isArchived,
+        stackParentId = remote.stackParentId;
 
   Asset.local(AssetEntity local, List<int> hash)
       : localId = local.id,
@@ -74,6 +75,7 @@ class Asset {
     this.exifInfo,
     required this.isFavorite,
     required this.isArchived,
+    this.stackParentId,
   });
 
   @ignore
@@ -142,6 +144,8 @@ class Asset {
   @ignore
   ExifInfo? exifInfo;
 
+  String? stackParentId;
+
   /// `true` if this [Asset] is present on the device
   @ignore
   bool get isLocal => localId != null;
@@ -195,7 +199,8 @@ class Asset {
         livePhotoVideoId == other.livePhotoVideoId &&
         isFavorite == other.isFavorite &&
         isLocal == other.isLocal &&
-        isArchived == other.isArchived;
+        isArchived == other.isArchived &&
+        stackParentId == other.stackParentId;
   }
 
   @override
@@ -217,7 +222,8 @@ class Asset {
       livePhotoVideoId.hashCode ^
       isFavorite.hashCode ^
       isLocal.hashCode ^
-      isArchived.hashCode;
+      isArchived.hashCode ^
+      stackParentId.hashCode;
 
   /// Returns `true` if this [Asset] can updated with values from parameter [a]
   bool canUpdate(Asset a) {
@@ -230,6 +236,7 @@ class Asset {
         width == null && a.width != null ||
         height == null && a.height != null ||
         livePhotoVideoId == null && a.livePhotoVideoId != null ||
+        stackParentId == null && a.stackParentId != null ||
         !isRemote && a.isRemote && isFavorite != a.isFavorite ||
         !isRemote && a.isRemote && isArchived != a.isArchived;
   }
@@ -260,6 +267,7 @@ class Asset {
           id: id,
           remoteId: remoteId,
           livePhotoVideoId: livePhotoVideoId,
+          stackParentId: stackParentId,
           isFavorite: isFavorite,
           isArchived: isArchived,
         );
@@ -273,6 +281,7 @@ class Asset {
           width: a.width,
           height: a.height,
           livePhotoVideoId: a.livePhotoVideoId,
+          stackParentId: a.stackParentId,
           // isFavorite + isArchived are not set by device-only assets
           isFavorite: a.isFavorite,
           isArchived: a.isArchived,
@@ -308,6 +317,7 @@ class Asset {
     bool? isFavorite,
     bool? isArchived,
     ExifInfo? exifInfo,
+    String? stackParentId,
   }) =>
       Asset(
         id: id ?? this.id,
@@ -327,6 +337,7 @@ class Asset {
         isFavorite: isFavorite ?? this.isFavorite,
         isArchived: isArchived ?? this.isArchived,
         exifInfo: exifInfo ?? this.exifInfo,
+        stackParentId: stackParentId ?? this.stackParentId,
       );
 
   Future<void> put(Isar db) async {
@@ -368,6 +379,7 @@ class Asset {
   "checksum": "$checksum",
   "ownerId": $ownerId, 
   "livePhotoVideoId": "${livePhotoVideoId ?? "N/A"}",
+  "stackParentId": "${stackParentId ?? "N/A"}",
   "fileCreatedAt": "$fileCreatedAt",
   "fileModifiedAt": "$fileModifiedAt", 
   "updatedAt": "$updatedAt", 

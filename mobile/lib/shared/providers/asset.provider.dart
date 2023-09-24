@@ -5,6 +5,7 @@ import 'package:immich_mobile/shared/models/exif_info.dart';
 import 'package:immich_mobile/shared/models/store.dart';
 import 'package:immich_mobile/shared/models/user.dart';
 import 'package:immich_mobile/shared/providers/db.provider.dart';
+import 'package:immich_mobile/shared/providers/user.provider.dart';
 import 'package:immich_mobile/shared/services/asset.service.dart';
 import 'package:immich_mobile/modules/home/ui/asset_grid/asset_grid_data_structure.dart';
 import 'package:immich_mobile/modules/settings/providers/app_settings.provider.dart';
@@ -189,6 +190,7 @@ final assetsProvider =
       .filter()
       .ownerIdEqualTo(userId)
       .isArchivedEqualTo(false)
+      .stackParentIdIsNull() // Ignore stacked assets
       .sortByFileCreatedAtDesc();
   final settings = ref.watch(appSettingsServiceProvider);
   final groupBy =
@@ -200,8 +202,11 @@ final assetsProvider =
 });
 
 final remoteAssetsProvider =
-    StreamProvider.family<RenderList, int?>((ref, userId) async* {
-  if (userId == null) return;
+    StreamProvider.family<RenderList, String?>((ref, remoteId) async* {
+  final userId = ref.watch(currentUserProvider)?.isarId;
+  if (userId == null) {
+    return;
+  }
   final query = ref
       .watch(dbProvider)
       .assets
@@ -209,6 +214,12 @@ final remoteAssetsProvider =
       .remoteIdIsNotNull()
       .filter()
       .ownerIdEqualTo(userId)
+      .group(
+        (q) => q.stackParentIdIsNull().optional(
+              remoteId != null,
+              (q) => q.or().stackParentIdEqualTo(remoteId),
+            ),
+      )
       .sortByFileCreatedAtDesc();
   final settings = ref.watch(appSettingsServiceProvider);
   final groupBy =
