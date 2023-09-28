@@ -150,6 +150,7 @@ export class PersonRepository implements IPersonRepository {
       .createQueryBuilder('faces')
       .leftJoinAndSelect('faces.asset', 'asset')
       .where('asset.ownerId = :ownerId', { ownerId })
+      .andWhere(`(faces.embedding <=> ${asVector(embedding)}) <= :maxDistance`, { maxDistance })
       .orderBy(`faces.embedding <=> ${asVector(embedding)}`)
       .limit(numResults)
       .getMany();

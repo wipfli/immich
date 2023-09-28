@@ -54,7 +54,12 @@ export class SearchService {
           machineLearning: { clip },
         } = await this.configCore.getConfig();
         const embedding = await this.machineLearning.encodeText(machineLearning.url, { text: query }, clip);
-        assets = await this.smartInfoRepository.searchByEmbedding({ ownerId: authUser.id, embedding, numResults: 100 });
+        assets = await this.smartInfoRepository.searchByEmbedding({
+          ownerId: authUser.id,
+          embedding,
+          numResults: 100,
+          maxDistance: 1,
+        });
         break;
       case SearchStrategy.TEXT:
       default:

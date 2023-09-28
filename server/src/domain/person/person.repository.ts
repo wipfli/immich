@@ -20,7 +20,7 @@ export interface EmbeddingSearch {
   ownerId: string;
   embedding: number[];
   numResults: number;
-  maxDistance?: number;
+  maxDistance: number;
 }
 
 export interface IPersonRepository {

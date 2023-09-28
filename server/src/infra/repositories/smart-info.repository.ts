@@ -7,13 +7,14 @@ import { asVector } from '../infra.utils.ts';
 
 @Injectable()
 export class SmartInfoRepository implements ISmartInfoRepository {
-  constructor(@InjectRepository(SmartInfoEntity) private repository: Repository<SmartInfoEntity>) { }
+  constructor(@InjectRepository(SmartInfoEntity) private repository: Repository<SmartInfoEntity>) {}
 
-  async searchByEmbedding({ ownerId, embedding, numResults }: EmbeddingSearch): Promise<AssetEntity[]> {
+  async searchByEmbedding({ ownerId, embedding, numResults, maxDistance }: EmbeddingSearch): Promise<AssetEntity[]> {
     const results = await this.repository
       .createQueryBuilder('smartInfo')
       .leftJoinAndSelect('smartInfo.asset', 'asset')
       .where('asset.ownerId = :ownerId', { ownerId })
+      .andWhere(`(smartInfo.clipEmbedding <=> ${asVector(embedding)}) <= :maxDistance`, { maxDistance })
       .orderBy(`smartInfo.clipEmbedding <=> ${asVector(embedding)}`)
       .limit(numResults)
       .getMany();
