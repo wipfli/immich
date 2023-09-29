@@ -4,6 +4,8 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
   import ChevronLeft from 'svelte-material-icons/ChevronLeft.svelte';
   import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
+  import Shuffle from 'svelte-material-icons/Shuffle.svelte';
+  import ShuffleDisabled from 'svelte-material-icons/ShuffleDisabled.svelte';
   import ImageBrokenVariant from 'svelte-material-icons/ImageBrokenVariant.svelte';
   import { fly } from 'svelte/transition';
   import AlbumSelectionModal from '../shared-components/album-selection-modal.svelte';
@@ -23,16 +25,19 @@
   import NavigationArea from './navigation-area.svelte';
   import { browser } from '$app/environment';
   import { handleError } from '$lib/utils/handle-error';
-  import type { AssetStore } from '$lib/stores/assets.store';
+  import { BucketPosition, type AssetStore } from '$lib/stores/assets.store';
   import CircleIconButton from '../elements/buttons/circle-icon-button.svelte';
   import Close from 'svelte-material-icons/Close.svelte';
   import ProgressBar, { ProgressBarStatus } from '../shared-components/progress-bar/progress-bar.svelte';
   import { shouldIgnoreShortcut } from '$lib/utils/shortcut';
+  import { assetViewingStore } from '$lib/stores/asset-viewing.store';
 
   export let assetStore: AssetStore | null = null;
   export let asset: AssetResponseDto;
   export let showNavigation = true;
   export let sharedLink: SharedLinkResponseDto | undefined = undefined;
+
+  const { slideshow, slideshowShuffle, setAssetId } = assetViewingStore;
 
   const dispatch = createEventDispatcher<{
     archived: AssetResponseDto;
@@ -75,6 +80,8 @@
   });
 
   $: asset.id && !sharedLink && getAllAlbums(); // Update the album information when the asset ID changes
+  $: $slideshow ? handlePlaySlideshow() : handleStopSlideshow();
+  $: $slideshowShuffle && preload();
 
   const getAllAlbums = async () => {
     if (api.isSharedLink) {
@@ -142,8 +149,26 @@
 
   const closeViewer = () => dispatch('close');
 
+  const navigateAssetRandom = async () => {
+    if (!assetStore) {
+      return;
+    }
+
+    const asset = assetStore.getRandomAsset();
+    if (!asset) {
+      return;
+    }
+
+    setAssetId(asset.id);
+    progressBar.restart(true);
+  };
+
   const navigateAssetForward = async (e?: Event) => {
-    if (isSlideshowMode && assetStore && progressBar) {
+    if ($slideshow && $slideshowShuffle) {
+      return navigateAssetRandom();
+    }
+
+    if ($slideshow && assetStore && progressBar) {
       const hasNext = await assetStore.getNextAssetId(asset.id);
       if (hasNext) {
         progressBar.restart(true);
@@ -157,7 +182,11 @@
   };
 
   const navigateAssetBackward = (e?: Event) => {
-    if (isSlideshowMode && progressBar) {
+    if ($slideshow && $slideshowShuffle) {
+      return navigateAssetRandom();
+    }
+
+    if ($slideshow && progressBar) {
       progressBar.restart(true);
     }
 
@@ -298,40 +327,55 @@
    * Slide show mode
    */
 
-  let isSlideshowMode = false;
   let assetViewerHtmlElement: HTMLElement;
   let progressBar: ProgressBar;
   let progressBarStatus: ProgressBarStatus;
 
   const handleVideoStarted = () => {
-    if (isSlideshowMode) {
+    if ($slideshow) {
       progressBar.restart(false);
     }
   };
 
   const handleVideoEnded = async () => {
-    if (isSlideshowMode) {
+    if ($slideshow) {
       await navigateAssetForward();
     }
   };
 
+  const preload = async () => {
+    // load all the asset buckets
+    if (assetStore && $slideshowShuffle) {
+      for (const bucket of assetStore.buckets) {
+        await assetStore.loadBucket(bucket.bucketDate, BucketPosition.Unknown);
+      }
+    }
+  };
+
   const handlePlaySlideshow = async () => {
+    if ($slideshow) {
+      return;
+    }
+
     try {
       await assetViewerHtmlElement.requestFullscreen();
     } catch (error) {
       console.error('Error entering fullscreen', error);
-    } finally {
-      isSlideshowMode = true;
+      $slideshow = false;
     }
   };
 
   const handleStopSlideshow = async () => {
+    if (!$slideshow) {
+      return;
+    }
+
     try {
       await document.exitFullscreen();
     } catch (error) {
       console.error('Error exiting fullscreen', error);
     } finally {
-      isSlideshowMode = false;
+      $slideshow = false;
       progressBar.restart(false);
     }
   };
@@ -343,11 +387,16 @@
   bind:this={assetViewerHtmlElement}
 >
   <div class="z-[1000] col-span-4 col-start-1 row-span-1 row-start-1 transition-transform">
-    {#if isSlideshowMode}
+    {#if $slideshow}
       <!-- SlideShowController -->
       <div class="flex">
         <div class="m-4 flex gap-2">
-          <CircleIconButton logo={Close} on:click={handleStopSlideshow} title="Exit Slideshow" />
+          <CircleIconButton logo={Close} on:click={() => ($slideshow = false)} title="Exit Slideshow" />
+          {#if $slideshowShuffle}
+            <CircleIconButton logo={Shuffle} on:click={() => ($slideshowShuffle = false)} title="Shuffle" />
+          {:else}
+            <CircleIconButton logo={ShuffleDisabled} on:click={() => ($slideshowShuffle = true)} title="No shuffle" />
+          {/if}
           <CircleIconButton
             logo={progressBarStatus === ProgressBarStatus.Paused ? Play : Pause}
             on:click={() => (progressBarStatus === ProgressBarStatus.Paused ? progressBar.play() : progressBar.pause())}
@@ -385,12 +434,12 @@
         on:toggleArchive={toggleArchive}
         on:asProfileImage={() => (isShowProfileImageCrop = true)}
         on:runJob={({ detail: job }) => handleRunJob(job)}
-        on:playSlideShow={handlePlaySlideshow}
+        on:playSlideShow={() => ($slideshow = true)}
       />
     {/if}
   </div>
 
-  {#if !isSlideshowMode && showNavigation}
+  {#if !$slideshow && showNavigation}
     <div class="column-span-1 z-[999] col-start-1 row-span-1 row-start-2 mb-[60px] justify-self-start">
       <NavigationArea on:click={navigateAssetBackward}><ChevronLeft size="36" /></NavigationArea>
     </div>
@@ -431,13 +480,13 @@
     {/key}
   </div>
 
-  {#if !isSlideshowMode && showNavigation}
+  {#if !$slideshow && showNavigation}
     <div class="z-[999] col-span-1 col-start-4 row-span-1 row-start-2 mb-[60px] justify-self-end">
       <NavigationArea on:click={navigateAssetForward}><ChevronRight size="36" /></NavigationArea>
     </div>
   {/if}
 
-  {#if !isSlideshowMode && $isShowDetail}
+  {#if !$slideshow && $isShowDetail}
     <div
       transition:fly={{ duration: 150 }}
       id="detail-panel"
